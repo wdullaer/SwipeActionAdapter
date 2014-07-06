@@ -7,9 +7,9 @@ Support for Android 4.0 and up. It might work on lower API versions, but I haven
 
 Feel free to fork or issue pull requests on github. Issues can be reported on the github issue tracker.
 
-<!-- ![Focused TokenAutoCompleteTextView example](https://raw.github.com/splitwise/TokenAutoComplete/gh-pages/images/focused.png) -->
+![Normal Swipe Gesture](https://raw.github.com/wdullaer/SwipeActionAdapter/gh-pages/images/swipe_1.png)
 
-<!-- ![Unfocused TokenAutoCompleteTextView example](https://raw.github.com/splitwise/TokenAutoComplete/gh-pages/images/not_focused.png) -->
+![Far Swipe Gesture](https://raw.github.com/wdullaer/SwipeActionAdapter/gh-pages/images/swipe_2.png)
 
 Setup
 =====
