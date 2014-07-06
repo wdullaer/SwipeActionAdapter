@@ -21,5 +21,6 @@ android {
 task jar(type: Jar) {
     dependsOn assembleRelease
     baseName "swipeactionadapter"
-    from fileTree(dir: 'build/classes/release')
+    version "1.0.0"
+    from fileTree(dir: 'build/intermediates/classes/release/')
 }
