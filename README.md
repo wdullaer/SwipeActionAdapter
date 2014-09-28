@@ -1,9 +1,12 @@
 SwipeActionAdapter - The Mailbox-like Swipe gesture library
 ===========================================================
 
-SwipeActionAdapter is a library that provides a simple API to create Mailbox-like action when swiping in a ListView. The idea is to make it simple enough to implement while still providing sufficient options to allow you to integrate it with the design of your application.
+SwipeActionAdapter is a library that provides a simple API to create Mailbox-like action when swiping in a ListView.
+The idea is to make it simple enough to implement while still providing sufficient options to allow you to
+integrate it with the design of your application.
 
-Support for Android 4.0 and up. It might work on lower API versions, but I haven't tested it and I don't intend to make any effort in that direction.
+Support for Android 4.0 and up. It might work on lower API versions, but I haven't tested it and I don't intend to
+make any effort in that direction.
 
 Feel free to fork or issue pull requests on github. Issues can be reported on the github issue tracker.
 
@@ -16,7 +19,8 @@ Setup
 
 * [Download the jar file](https://github.com/wdullaer/SwipeActionAdapter/releases) and add it to your project
 
-If you would like to get the most recent code in a jar, clone the project and run ```./gradlew jar``` from the root folder. This will build a swipeactionadapter.jar in ```library/build/libs/```.
+If you would like to get the most recent code in a jar, clone the project and run ```./gradlew jar``` from
+the root folder. This will build a swipeactionadapter.jar in ```library/build/libs/```.
 
 You may also add the library as an Android Library to your project. All the library files live in ```library```.
 
@@ -33,7 +37,11 @@ For a basic implementation, you'll need to
 
 ### Wrap the adapter of you ListView
 
-The majority of this libraries functionality is provided through an adapter which wraps around the content ```Adapter``` of your ```ListView```. You will need to set the SwipeActionAdapter to your ListView and because we need to set some properties of the ListView, you will also need to give a reference of the ```ListView``` to the ```SwipeActionAdapter```. This is typically done in your ```Activity```'s or ```Fragments``` onCreate/onActivityCreated callbacks.
+The majority of this libraries functionality is provided through an adapter which wraps around the content ```Adapter```
+of your ```ListView```. You will need to set the SwipeActionAdapter to your ListView and because 
+we need to set some properties of the ListView, you will also need to give a reference of the ```ListView```
+to the ```SwipeActionAdapter```.
+This is typically done in your ```Activity```'s or ```Fragments``` onCreate/onActivityCreated callbacks.
 
 ```java
 protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +56,13 @@ protected void onCreate(Bundle savedInstanceState) {
             R.id.text,
             new ArrayList<String>(Arrays.asList(content))
     );
-    
+
     // Wrap your content in a SwipeActionAdapter
     mAdapter = new SwipeActionAdapter(stringAdapter);
-    
+
     // Pass a reference of your ListView to the SwipeActionAdapter
     mAdapter.setListView(getListView());
-    
+
     // Set the SwipeActionAdapter as the Adapter for your ListView
     setListAdapter(mAdapter);
 }
@@ -63,7 +71,8 @@ protected void onCreate(Bundle savedInstanceState) {
 ### Create a  background layout for each swipe direction
 
 I'm just supplying an empty layout with a background for each direction.
-You should have a layout for at least ```SwipeDirections.DIRECTION_NORMAL_LEFT``` and ```SwipeDirections.DIRECTION_NORMAL_RIGHT```. The other directions are optional.
+You should have a layout for at least ```SwipeDirections.DIRECTION_NORMAL_LEFT``` and ```SwipeDirections.DIRECTION_NORMAL_RIGHT```.
+The other directions are optional.
 It is important that the background layouts have the same height as the normal row layout.
 The ```onCreate``` callback from the previous section now becomes:
 
@@ -80,16 +89,16 @@ protected void onCreate(Bundle savedInstanceState) {
             R.id.text,
             new ArrayList<String>(Arrays.asList(content))
     );
-    
+
     // Wrap your content in a SwipeActionAdapter
     mAdapter = new SwipeActionAdapter(stringAdapter);
-    
+
     // Pass a reference of your ListView to the SwipeActionAdapter
     mAdapter.setListView(getListView());
 
     // Set the SwipeActionAdapter as the Adapter for your ListView
     setListAdapter(mAdapter);
-    
+
     // Set backgrounds for the swipe directions
     mAdapter.addBackground(SwipeDirections.DIRECTION_FAR_LEFT,R.layout.row_bg_left_far)
             .addBackground(SwipeDirections.DIRECTION_NORMAL_LEFT,R.layout.row_bg_left)
@@ -111,9 +120,15 @@ Layout code
 
 ### Implement the SwipeActionListener
 
-The final thing to do is listen to swipe gestures. This is done by implementing the ```SwipeActionListener```. This interface has two methods:
+The final thing to do is listen to swipe gestures. This is done by implementing the ```SwipeActionListener```.
+This interface has three methods:
 * ```boolean hasActions(int position)```: return true if you want this item to be swipeable
-* ```boolean onSwipe(int position, int direction)```: triggered when an item is swiped. Return true if you want the item to be dismissed, return false if it should stay visible. This method runs on the interface thread so perform any heavy logic in an ASyncThread
+* ```boolean shouldDismiss(int position, int direction)```: return true if you want the item to be dismissed,
+return false if it should stay visible. This method runs on the interface thread so if you want to trigger any
+heavy actions here, put them on an ```ASyncThread```
+* ```void onSwipe(int[] position, int[] direction)```: triggered when all animations on the swiped items have finished.
+You will receive an array of all swiped items, sorted in descending order with their corresponding directions.
+
 You should pass a reference of your ```SwipeActionListener``` to the ```SwipeActionAdapter```
 
 Here's the final implementation of our example's ```onCreate``` method:
@@ -130,22 +145,22 @@ protected void onCreate(Bundle savedInstanceState) {
             R.id.text,
             new ArrayList<String>(Arrays.asList(content))
     );
-    
+
     // Wrap your content in a SwipeActionAdapter
     mAdapter = new SwipeActionAdapter(stringAdapter);
-    
+
     // Pass a reference of your ListView to the SwipeActionAdapter
     mAdapter.setListView(getListView());
 
     // Set the SwipeActionAdapter as the Adapter for your ListView
     setListAdapter(mAdapter);
-    
+
     // Set backgrounds for the swipe directions
     mAdapter.addBackground(SwipeDirections.DIRECTION_FAR_LEFT,R.layout.row_bg_left_far)
             .addBackground(SwipeDirections.DIRECTION_NORMAL_LEFT,R.layout.row_bg_left)
             .addBackground(SwipeDirections.DIRECTION_FAR_RIGHT,R.layout.row_bg_right_far)
             .addBackground(SwipeDirections.DIRECTION_NORMAL_RIGHT,R.layout.row_bg_right);
-    
+
     // Listen to swipes
     mAdapter.setSwipeActionListener(new SwipeActionListener(){
         @Override
@@ -155,35 +170,42 @@ protected void onCreate(Bundle savedInstanceState) {
         }
 
         @Override
-        public boolean onSwipe(int position, int direction){
-            String dir = "";
-            boolean output = false;
-            switch(direction) {
-                case SwipeDirections.DIRECTION_FAR_LEFT:
-                    dir = "Far left";
-                    break;
-                case SwipeDirections.DIRECTION_NORMAL_LEFT:
-                    dir = "Left";
-                    output = true;
-                    break;
-                case SwipeDirections.DIRECTION_FAR_RIGHT:
-                    dir = "Far right";
-                    break;
-                case SwipeDirections.DIRECTION_NORMAL_RIGHT:
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Test Dialog").setMessage("You swiped right").create().show();
-                    dir = "Right";
-                    break;
-            }
-            Toast.makeText(
-                    this,
-                    dir + " swipe Action triggered on "+mAdapter.getItem(position),
-                    Toast.LENGTH_SHORT
-            ).show();
-            mAdapter.notifyDataSetChanged();
+        public boolean shouldDismiss(int position, int direction){
+            // Only dismiss an item when swiping normal left
+            return direction == SwipeDirections.DIRECTION_NORMAL_LEFT;
+        }
 
-            return output;
-        }    
+        @Override
+        public void onSwipe(int[] positionList, int[] directionList){
+            for(int i=0;i<positionList.length;i++) {
+                int direction = directionList[i];
+                int position = positionList[i];
+                String dir = "";
+
+                switch (direction) {
+                    case SwipeDirections.DIRECTION_FAR_LEFT:
+                        dir = "Far left";
+                        break;
+                    case SwipeDirections.DIRECTION_NORMAL_LEFT:
+                        dir = "Left";
+                        break;
+                    case SwipeDirections.DIRECTION_FAR_RIGHT:
+                        dir = "Far right";
+                        break;
+                    case SwipeDirections.DIRECTION_NORMAL_RIGHT:
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle("Test Dialog").setMessage("You swiped right").create().show();
+                        dir = "Right";
+                        break;
+                }
+                Toast.makeText(
+                        this,
+                        dir + " swipe Action triggered on " + mAdapter.getItem(position),
+                        Toast.LENGTH_SHORT
+                ).show();
+                mAdapter.notifyDataSetChanged();
+            }
+        }
     });
 }
 ```
