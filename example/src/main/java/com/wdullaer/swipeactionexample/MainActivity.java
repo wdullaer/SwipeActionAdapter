@@ -96,33 +96,39 @@ public class MainActivity extends ListActivity implements
     }
 
     @Override
-    public boolean onSwipe(int position, int direction){
-        String dir = "";
-        boolean output = false;
-        switch(direction) {
-            case SwipeDirections.DIRECTION_FAR_LEFT:
-                dir = "Far left";
-                break;
-            case SwipeDirections.DIRECTION_NORMAL_LEFT:
-                dir = "Left";
-                output = true;
-                break;
-            case SwipeDirections.DIRECTION_FAR_RIGHT:
-                dir = "Far right";
-                break;
-            case SwipeDirections.DIRECTION_NORMAL_RIGHT:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Test Dialog").setMessage("You swiped right").create().show();
-                dir = "Right";
-                break;
-        }
-        Toast.makeText(
-                this,
-                dir + " swipe Action triggered on "+mAdapter.getItem(position),
-                Toast.LENGTH_SHORT
-        ).show();
-        mAdapter.notifyDataSetChanged();
+    public boolean shouldDismiss(int position, int direction){
+        return direction == SwipeDirections.DIRECTION_NORMAL_LEFT;
+    }
 
-        return output;
+    @Override
+    public void onSwipe(int[] positionList, int[] directionList){
+        for(int i=0;i<positionList.length;i++) {
+            int direction = directionList[i];
+            int position = positionList[i];
+            String dir = "";
+
+            switch (direction) {
+                case SwipeDirections.DIRECTION_FAR_LEFT:
+                    dir = "Far left";
+                    break;
+                case SwipeDirections.DIRECTION_NORMAL_LEFT:
+                    dir = "Left";
+                    break;
+                case SwipeDirections.DIRECTION_FAR_RIGHT:
+                    dir = "Far right";
+                    break;
+                case SwipeDirections.DIRECTION_NORMAL_RIGHT:
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Test Dialog").setMessage("You swiped right").create().show();
+                    dir = "Right";
+                    break;
+            }
+            Toast.makeText(
+                    this,
+                    dir + " swipe Action triggered on " + mAdapter.getItem(position),
+                    Toast.LENGTH_SHORT
+            ).show();
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

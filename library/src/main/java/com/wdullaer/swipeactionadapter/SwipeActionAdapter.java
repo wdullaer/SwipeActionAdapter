@@ -80,11 +80,25 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
      * @param position The position to perform the action on, sorted in descending  order
      *                 for convenience.
      * @param direction The type of swipe that triggered the action
-     * @return boolean indicating whether the item should be dismissed afterwards or not
+     * @return boolean that indicates whether the list item should be dismissed or shown again.
      */
     @Override
-    public boolean onAction(ListView listView, int position, int direction){
-        return mSwipeActionListener != null && mSwipeActionListener.onSwipe(position,direction);
+    public boolean onPreAction(ListView listView, int position, int direction){
+        return mSwipeActionListener != null && mSwipeActionListener.shouldDismiss(position, direction);
+    }
+
+    /**
+     * SwipeActionTouchListener.ActionCallbacks callback
+     * We just link it through to our own interface
+     *
+     * @param listView The originating {@link ListView}.
+     * @param position The positions to perform the action on, sorted in descending  order
+     *                 for convenience.
+     * @param direction The type of swipe that triggered the action.
+     */
+    @Override
+    public void onAction(ListView listView, int[] position, int[] direction){
+        if(mSwipeActionListener != null) mSwipeActionListener.onSwipe(position,direction);
     }
 
     /**
@@ -166,6 +180,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
      */
     public interface SwipeActionListener{
         public boolean hasActions(int position);
-        public boolean onSwipe(int position, int direction);
+        public boolean shouldDismiss(int position, int direction);
+        public void onSwipe(int[] position, int[] direction);
     }
 }

@@ -105,22 +105,35 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
     public interface ActionCallbacks {
         /**
          * Called to determine whether the given position can be dismissed.
+         *
+         * @param position the position of the item that was swiped
+         * @return boolean indicating whether the item has actions
          */
         boolean hasActions(int position);
 
         /**
-         * Called when the user has swiped one or list item position.
+         * Called when the user has swiped a list item position.
          * The listener will wait for this method to return before starting the dismiss animation
          * or the reappear animation. Please perform any heavy computations in an ASyncTask to avoid
          * blocking the interface.
          *
+         * @param listView The originating {@link ListView}.
+         * @param position The position to perform the action on, sorted in descending  order
+         *                 for convenience.
+         * @param direction The type of swipe that triggered the action
          * @return boolean that indicates whether the list item should be dismissed or shown again.
+         */
+        boolean onPreAction(ListView listView, int position, int direction);
+
+        /**
+         * Called after the dismiss or reappear animation of a swiped item has finished.
+         *
          * @param listView The originating {@link ListView}.
          * @param position The position to perform the action on, sorted in descending  order
          *                 for convenience.
          * @param direction The type of swipe that triggered the action
          */
-        boolean onAction(ListView listView, int position, int direction);
+        void onAction(ListView listView, int[] position, int[] direction);
     }
 
     /**
@@ -304,13 +317,13 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                             .setListener(new AnimatorListenerAdapter() {
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
-                                    boolean performDismiss = mCallbacks.onAction(
+                                    boolean performDismiss = mCallbacks.onPreAction(
                                             mListView,
                                             downPosition,
                                             direction
                                     );
-                                    if(performDismiss) performDismiss(downView,downPosition);
-                                    else slideBack(downView);
+                                    if(performDismiss) performDismiss(downView,downPosition,direction);
+                                    else slideBack(downView, downPosition, direction);
                                 }
                             });
                 } else {
@@ -375,10 +388,12 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
 
     class PendingDismissData implements Comparable<PendingDismissData> {
         public int position;
+        public int direction;
         public View view;
 
-        public PendingDismissData(int position, View view) {
+        public PendingDismissData(int position, int direction, View view) {
             this.position = position;
+            this.direction = direction;
             this.view = view;
         }
 
@@ -389,17 +404,17 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
         }
     }
 
-    private void slideBack(final View slideInView){
-        float translation = slideInView.getTranslationX();
-        slideInView.setTranslationX(translation);
+    private void slideBack(final View slideInView, final int downPosition, final int direction){
+        mPendingDismisses.add(new PendingDismissData(downPosition,direction,slideInView));
+        slideInView.setTranslationX(slideInView.getTranslationX());
         slideInView.animate()
                 .translationX(0)
                 .alpha(1)
                 .setDuration(mAnimationTime)
-                .setListener(null);
+                .setListener(createAnimatorListener(slideInView.getHeight()));
     }
 
-    private void performDismiss(final View dismissView, final int dismissPosition) {
+    private void performDismiss(final View dismissView, final int dismissPosition, final int direction) {
         // Animate the dismissed list item to zero-height and fire the dismiss callback when
         // all dismissed list item animations have completed. This triggers layout on each animation
         // frame; in the future we may want to do something smarter and more performant.
@@ -409,7 +424,22 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
 
         ValueAnimator animator = ValueAnimator.ofInt(originalHeight, 1).setDuration(mAnimationTime);
 
-        animator.addListener(new AnimatorListenerAdapter() {
+        animator.addListener(createAnimatorListener(originalHeight));
+
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                lp.height = (Integer) valueAnimator.getAnimatedValue();
+                dismissView.setLayoutParams(lp);
+            }
+        });
+
+        mPendingDismisses.add(new PendingDismissData(dismissPosition, direction, dismissView));
+        animator.start();
+    }
+
+    private AnimatorListenerAdapter createAnimatorListener(final int originalHeight){
+        return new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 --mDismissAnimationRefCount;
@@ -419,10 +449,12 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                     Collections.sort(mPendingDismisses);
 
                     int[] dismissPositions = new int[mPendingDismisses.size()];
+                    int[] dismissDirections = new int [mPendingDismisses.size()];
                     for (int i = mPendingDismisses.size() - 1; i >= 0; i--) {
                         dismissPositions[i] = mPendingDismisses.get(i).position;
+                        dismissDirections[i] = mPendingDismisses.get(i).direction;
                     }
-                    //mCallbacks.onActionLeft(mListView, dismissPositions);
+                    mCallbacks.onAction(mListView, dismissPositions, dismissDirections);
 
                     // Reset mDownPosition to avoid MotionEvent.ACTION_UP trying to start a dismiss
                     // animation with a stale position
@@ -447,17 +479,6 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                     mPendingDismisses.clear();
                 }
             }
-        });
-
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                lp.height = (Integer) valueAnimator.getAnimatedValue();
-                dismissView.setLayoutParams(lp);
-            }
-        });
-
-        mPendingDismisses.add(new PendingDismissData(dismissPosition, dismissView));
-        animator.start();
+        };
     }
 }
