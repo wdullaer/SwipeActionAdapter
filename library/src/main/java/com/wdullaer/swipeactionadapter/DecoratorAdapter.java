@@ -32,6 +32,9 @@ public class DecoratorAdapter extends BaseAdapter {
     public DecoratorAdapter(BaseAdapter baseAdapter){
         mBaseAdapter = baseAdapter;
     }
+    public BaseAdapter getAdapter(){
+        return mBaseAdapter;
+    }
 
     @Override
     public int getCount(){

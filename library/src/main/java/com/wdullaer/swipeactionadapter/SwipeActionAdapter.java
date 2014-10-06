@@ -55,7 +55,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
             }
         }
 
-        output.setContentView(super.getView(position,output.getContentView(),parent));
+        output.setContentView(super.getView(position,output.getContentView(),output));
 
         return output;
     }
