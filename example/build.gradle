@@ -5,13 +5,13 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 19
+    compileSdkVersion 21
     buildToolsVersion "19.1.0"
     useOldManifestMerger true
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 19
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }
