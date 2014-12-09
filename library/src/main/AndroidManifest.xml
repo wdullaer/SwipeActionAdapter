@@ -8,6 +8,6 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="17" />
 
-    <application android:label="SwipeActionListView" />
+    <application />
 
 </manifest>
