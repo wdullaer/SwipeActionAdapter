@@ -16,7 +16,7 @@
 
 package com.wdullaer.swipeactionadapter;
 
-import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -37,7 +37,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
     private boolean mFadeOut = false;
     private boolean mFixedBackgrounds = false;
 
-    protected SparseArray<Integer> mBackgroundResIds = new SparseArray<Integer>();
+    protected SparseIntArray mBackgroundResIds = new SparseIntArray();
 
     public SwipeActionAdapter(BaseAdapter baseAdapter){
         super(baseAdapter);
@@ -45,7 +45,6 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent){
-        // TODO: add our custom background images here (provide some good defaults)
         SwipeViewGroup output = (SwipeViewGroup)convertView;
 
         if(output == null) {
@@ -53,6 +52,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
             for (int i = 0; i < mBackgroundResIds.size(); i++) {
                 output.addBackground(View.inflate(parent.getContext(),mBackgroundResIds.valueAt(i), null),mBackgroundResIds.keyAt(i));
             }
+            output.setSwipeTouchListener(mTouchListener);
         }
 
         output.setContentView(super.getView(position,output.getContentView(),output));

@@ -17,16 +17,27 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="?android:listPreferredItemHeight"
     android:background="@android:color/transparent">
     <TextView
         android:id="@+id/text"
         android:layout_margin="8dp"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
         android:textAppearance="?android:textAppearanceListItem"
         android:text="Dummy"/>
+    <Space android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="16dp" />
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="16dp"
+        android:text="Button" />
 
 </LinearLayout>

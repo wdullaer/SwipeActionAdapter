@@ -17,8 +17,10 @@
 package com.wdullaer.swipeactionadapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.SparseArray;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -31,7 +33,8 @@ public class SwipeViewGroup extends FrameLayout {
     private View contentView = null;
 
     private int visibleView = SwipeDirections.DIRECTION_NEUTRAL;
-    private SparseArray<View> mBackgroundMap = new SparseArray<View>();
+    private SparseArray<View> mBackgroundMap = new SparseArray<>();
+    private OnTouchListener swipeTouchListener;
 
     /**
      * Standard android View constructor
@@ -49,7 +52,7 @@ public class SwipeViewGroup extends FrameLayout {
      * @param attrs
      */
     public SwipeViewGroup(Context context, AttributeSet attrs) {
-        super(context,attrs);
+        super(context, attrs);
     }
 
     /**
@@ -60,7 +63,7 @@ public class SwipeViewGroup extends FrameLayout {
      * @param defStyle
      */
     public SwipeViewGroup(Context context, AttributeSet attrs, int defStyle) {
-        super(context,attrs,defStyle);
+        super(context, attrs, defStyle);
     }
 
     /**
@@ -129,6 +132,18 @@ public class SwipeViewGroup extends FrameLayout {
         }
     }
 
+    /**
+     * Set a touch listener the SwipeViewGroup will watch: once the OnTouchListener is interested in
+     * events, the SwipeViewGroup will stop propagating touch events to its children
+     *
+     * @param swipeTouchListener The OnTouchListener to watch
+     * @return A reference to the layout so commands can be chained
+     */
+    public SwipeViewGroup setSwipeTouchListener(OnTouchListener swipeTouchListener) {
+        this.swipeTouchListener = swipeTouchListener;
+        return this;
+    }
+
     @Override
     public Object getTag() {
         if(contentView != null) return contentView.getTag();
@@ -149,5 +164,17 @@ public class SwipeViewGroup extends FrameLayout {
     @Override
     public void setTag(int key, Object tag) {
         if(contentView != null) contentView.setTag(key, tag);
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        // Start tracking the touch when a child is processing it
+        return super.onInterceptTouchEvent(ev) || swipeTouchListener.onTouch(this, ev);
+    }
+
+    @Override
+    public boolean onTouchEvent(@NonNull MotionEvent ev) {
+        // Finish the swipe gesture: our parent will no longer do it if this function is called
+        return swipeTouchListener.onTouch(this, ev);
     }
 }
