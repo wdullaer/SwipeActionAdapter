@@ -16,29 +16,40 @@ Feel free to fork or issue pull requests on github. Issues can be reported on th
 
 Setup
 =====
+There are multiple options to add SwipeActionAdapter to your project:
 
-* [Download the jar file](https://github.com/wdullaer/SwipeActionAdapter/releases) and add it to your project
+* **Grade**  
+Add it as a dependency to your `build.gradle`
+```java
+dependencies {
+    compile 'com.wdullaer.swipeactionadapter:1.3.0'
+}
+```
 
+* **Jar File**  
+[Download the jar file](https://github.com/wdullaer/SwipeActionAdapter/releases) and add it to your project
+
+* **Build from source**  
 If you would like to get the most recent code in a jar, clone the project and run ```./gradlew jar``` from
-the root folder. This will build a swipeactionadapter.jar in ```library/build/libs/```.
+the root folder. This will build a `swipeactionadapter.jar` in ```library/build/libs/```.
 
 You may also add the library as an Android Library to your project. All the library files live in ```library```.
 
-Creating your listview with swipe actions
+Creating your ListView with swipe actions
 -----------------------------------------
 
 If you'd rather just start with a working example, clone the project and take a look.
 
 For a basic implementation, you'll need to
 
-1. Wrap the adapter of your ListView with a SwipeActionAdapter
+1. Wrap the Adapter of your ListView with a SwipeActionAdapter
 2. Create a background layout for each swipe direction you wish to act upon.
 3. Implement the SwipeActionAdapter
 
 ### Wrap the adapter of you ListView
 
 The majority of this libraries functionality is provided through an adapter which wraps around the content ```Adapter```
-of your ```ListView```. You will need to set the SwipeActionAdapter to your ListView and because 
+of your ```ListView```. You will need to set the SwipeActionAdapter to your ListView and because
 we need to set some properties of the ListView, you will also need to give a reference of the ```ListView```
 to the ```SwipeActionAdapter```.
 This is typically done in your ```Activity```'s or ```Fragments``` onCreate/onActivityCreated callbacks.
