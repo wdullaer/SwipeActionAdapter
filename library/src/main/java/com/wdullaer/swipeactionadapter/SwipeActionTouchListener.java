@@ -355,14 +355,9 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                 mVelocityTracker.addMovement(motionEvent);
                 float deltaX = motionEvent.getRawX() - mDownX;
                 float deltaY = motionEvent.getRawY() - mDownY;
-                if (Math.abs(deltaX) > mSlop && Math.abs(deltaY) < Math.abs(deltaX) / 2) {
+                if (!mSwiping && Math.abs(deltaX) > mSlop && Math.abs(deltaY) < Math.abs(deltaX) / 2) {
                     mSwiping = true;
                     mSwipingSlop = (deltaX > 0 ? mSlop : -mSlop);
-
-                    if(!mFar && Math.abs(deltaX) > mViewWidth/2) mFar = true;
-                    if(!mFar) mDirection = (deltaX > 0 ? SwipeDirections.DIRECTION_NORMAL_RIGHT : SwipeDirections.DIRECTION_NORMAL_LEFT);
-                    else mDirection = (deltaX > 0 ? SwipeDirections.DIRECTION_FAR_RIGHT : SwipeDirections.DIRECTION_FAR_LEFT);
-                    mDownViewGroup.showBackground(mDirection);
 
                     mListView.requestDisallowInterceptTouchEvent(true);
 
@@ -376,6 +371,12 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                 }
 
                 if (mSwiping) {
+                    if(mDirection*deltaX < 0) mFar = false;
+                    if(!mFar && Math.abs(deltaX) > mViewWidth/2) mFar = true;
+                    if(!mFar) mDirection = (deltaX > 0 ? SwipeDirections.DIRECTION_NORMAL_RIGHT : SwipeDirections.DIRECTION_NORMAL_LEFT);
+                    else mDirection = (deltaX > 0 ? SwipeDirections.DIRECTION_FAR_RIGHT : SwipeDirections.DIRECTION_FAR_LEFT);
+                    mDownViewGroup.showBackground(mDirection);
+
                     mDownView.setTranslationX(deltaX - mSwipingSlop);
                     if(mFadeOut) mDownView.setAlpha(Math.max(0f, Math.min(1f,
                                 1f - 2f * Math.abs(deltaX) / mViewWidth)));
