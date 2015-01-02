@@ -32,6 +32,8 @@ public class DecoratorAdapter extends BaseAdapter {
     public DecoratorAdapter(BaseAdapter baseAdapter){
         mBaseAdapter = baseAdapter;
     }
+
+    @SuppressWarnings("unused")
     public BaseAdapter getAdapter(){
         return mBaseAdapter;
     }

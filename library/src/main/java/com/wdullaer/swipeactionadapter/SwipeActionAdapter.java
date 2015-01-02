@@ -107,6 +107,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
      * @param mFadeOut true makes items fade out with a swipe (opacity -> 0)
      * @return A reference to the current instance so that commands can be chained
      */
+    @SuppressWarnings("unused")
     public SwipeActionAdapter setFadeOut(boolean mFadeOut){
         this.mFadeOut = mFadeOut;
         if(mListView != null) mTouchListener.setFadeOut(mFadeOut);
@@ -119,6 +120,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
      *
      * @param mFixedBackgrounds true for fixed backgrounds, false for swipe in
      */
+    @SuppressWarnings("unused")
     public SwipeActionAdapter setFixedBackgrounds(boolean mFixedBackgrounds){
         this.mFixedBackgrounds = mFixedBackgrounds;
         if(mListView != null) mTouchListener.setFixedBackgrounds(mFixedBackgrounds);
@@ -147,6 +149,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
      *
      * @return the current ListView
      */
+    @SuppressWarnings("unused")
     public AbsListView getListView(){
         return mListView;
     }
