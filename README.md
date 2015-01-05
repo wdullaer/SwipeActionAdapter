@@ -22,7 +22,7 @@ There are multiple options to add SwipeActionAdapter to your project:
 Add it as a dependency to your `build.gradle`
 ```java
 dependencies {
-    compile 'com.wdullaer.swipeactionadapter:1.3.0'
+    compile 'com.wdullaer.swipeactionadapter:1.3.2'
 }
 ```
 
@@ -226,10 +226,13 @@ Additional Options
 ==================
 
 ### setFadeOut(boolean fadeOut)
-Setting this to true will cause the ListView item to slowly fade out as it is being swiped
+Setting this to true will cause the ListView item to slowly fade out as it is being swiped.
 
 ### setFixedBackground(boolean setFixedBackground)
 Setting this to true will make the backgrounds static behind the ListView item instead of sliding in from the side.
+
+### setFarSwipeFraction(float farSwipeFraction)
+Allows you to set the fraction of the view width that must be swiped before it is counted as a far swipe. The float must be between 0 and 1. 0 makes every swipe a far swipe, 1 effectively disables a far swipe.
 
 
 License

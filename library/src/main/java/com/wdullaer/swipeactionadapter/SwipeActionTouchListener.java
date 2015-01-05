@@ -83,6 +83,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
     private int mViewWidth = 1; // 1 and not 0 to prevent dividing by zero
     private boolean mFadeOut = false;
     private boolean mFixedBackgrounds = false;
+    private float mFarSwipeFraction = 0.5f;
 
     // Transient properties
     private List<PendingDismissData> mPendingDismisses = new ArrayList<>();
@@ -192,7 +193,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
      *
      * @param fadeOut true for a fade out, false for no fade out.
      */
-    public void setFadeOut(boolean fadeOut){
+    protected void setFadeOut(boolean fadeOut){
         mFadeOut = fadeOut;
     }
 
@@ -202,8 +203,17 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
      *
      * @param fixedBackgrounds true for fixed backgrounds, false for swipe in
      */
-    public void setFixedBackgrounds(boolean fixedBackgrounds){
+    protected void setFixedBackgrounds(boolean fixedBackgrounds){
         mFixedBackgrounds = fixedBackgrounds;
+    }
+
+    /**
+     * Set the fraction of the View Width that needs to be swiped before it is counted as a far swipe
+     *
+     * @param farSwipeFraction float between 0 and 1
+     */
+    protected void setFarSwipeFraction(float farSwipeFraction) {
+        mFarSwipeFraction = farSwipeFraction;
     }
 
     @Override
@@ -372,7 +382,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
 
                 if (mSwiping) {
                     if(mDirection*deltaX < 0) mFar = false;
-                    if(!mFar && Math.abs(deltaX) > mViewWidth/2) mFar = true;
+                    if(!mFar && Math.abs(deltaX) > mViewWidth*mFarSwipeFraction) mFar = true;
                     if(!mFar) mDirection = (deltaX > 0 ? SwipeDirections.DIRECTION_NORMAL_RIGHT : SwipeDirections.DIRECTION_NORMAL_LEFT);
                     else mDirection = (deltaX > 0 ? SwipeDirections.DIRECTION_FAR_RIGHT : SwipeDirections.DIRECTION_FAR_LEFT);
                     mDownViewGroup.showBackground(mDirection);
