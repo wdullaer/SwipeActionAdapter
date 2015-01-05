@@ -36,6 +36,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
     protected SwipeActionListener mSwipeActionListener;
     private boolean mFadeOut = false;
     private boolean mFixedBackgrounds = false;
+    private float mFarSwipeFraction = 0.5f;
 
     protected SparseIntArray mBackgroundResIds = new SparseIntArray();
 
@@ -124,6 +125,21 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
     public SwipeActionAdapter setFixedBackgrounds(boolean mFixedBackgrounds){
         this.mFixedBackgrounds = mFixedBackgrounds;
         if(mListView != null) mTouchListener.setFixedBackgrounds(mFixedBackgrounds);
+        return this;
+    }
+
+    /**
+     * Set the fraction of the View Width that needs to be swiped before it is counted as a far swipe
+     *
+     * @param farSwipeFraction float between 0 and 1
+     */
+    @SuppressWarnings("unused")
+    public SwipeActionAdapter setFarSwipeFraction(float farSwipeFraction) {
+        if(farSwipeFraction < 0 || farSwipeFraction > 1) {
+            throw new IllegalArgumentException("Must be a float between 0 and 1");
+        }
+        mFarSwipeFraction = farSwipeFraction;
+        if(mListView != null) mTouchListener.setFarSwipeFraction(mFarSwipeFraction);
         return this;
     }
 
