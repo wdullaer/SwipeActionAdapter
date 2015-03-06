@@ -1,6 +1,8 @@
 SwipeActionAdapter - The Mailbox-like Swipe gesture library
 ===========================================================
 
+![Maven Central](https://img.shields.io/maven-central/v/com.wdullaer/swipeactionadapter.svg)
+
 SwipeActionAdapter is a library that provides a simple API to create Mailbox-like action when swiping in a ListView.
 The idea is to make it simple enough to implement while still providing sufficient options to allow you to
 integrate it with the design of your application.
