@@ -48,7 +48,7 @@ For a basic implementation, you'll need to
 2. Create a background layout for each swipe direction you wish to act upon.
 3. Implement the SwipeActionAdapter
 
-### Wrap the adapter of you ListView
+### Wrap the adapter of your ListView
 
 The majority of this libraries functionality is provided through an adapter which wraps around the content ```Adapter```
 of your ```ListView```. You will need to set the SwipeActionAdapter to your ListView and because
