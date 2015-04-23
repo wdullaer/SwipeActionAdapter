@@ -83,6 +83,8 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
     private int mViewWidth = 1; // 1 and not 0 to prevent dividing by zero
     private boolean mFadeOut = false;
     private boolean mFixedBackgrounds = false;
+    private boolean mDimBackgrounds = false;
+    private float mNormalSwipeFraction = 0.25f;
     private float mFarSwipeFraction = 0.5f;
 
     // Transient properties
@@ -208,12 +210,31 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
     }
 
     /**
+     * Set whether the backgrounds should be dimmed while in no-trigger zone
+     * The default value for this property is false: backgrounds will not dim
+     *
+     * @param dimBackgrounds true for fixed backgrounds, false for swipe in
+     */
+    protected void setDimBackgrounds(boolean dimBackgrounds){
+        mDimBackgrounds = dimBackgrounds;
+    }
+
+    /**
      * Set the fraction of the View Width that needs to be swiped before it is counted as a far swipe
      *
-     * @param farSwipeFraction float between 0 and 1
+     * @param farSwipeFraction float between 0 and 1, should be equal to or greater than normalSwipeFraction
      */
     protected void setFarSwipeFraction(float farSwipeFraction) {
         mFarSwipeFraction = farSwipeFraction;
+    }
+
+    /**
+     * Set the fraction of the View Width that needs to be swiped before it is counted as a normal swipe
+     *
+     * @param normalSwipeFraction float between 0 and 1, should be equal to or less than farSwipeFraction
+     */
+    protected void setNormalSwipeFraction(float normalSwipeFraction) {
+        mNormalSwipeFraction = normalSwipeFraction;
     }
 
     @Override
@@ -306,7 +327,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                 float absVelocityY = Math.abs(mVelocityTracker.getYVelocity());
                 boolean dismiss = false;
                 boolean dismissRight = false;
-                if (Math.abs(deltaX) > mViewWidth / 2 && mSwiping) {
+                if (Math.abs(deltaX) > (mViewWidth * mNormalSwipeFraction) && mSwiping) {
                     dismiss = true;
                     dismissRight = deltaX > 0;
                 } else if (mMinFlingVelocity <= absVelocityX && absVelocityX <= mMaxFlingVelocity
@@ -385,7 +406,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                     if(!mFar && Math.abs(deltaX) > mViewWidth*mFarSwipeFraction) mFar = true;
                     if(!mFar) mDirection = (deltaX > 0 ? SwipeDirections.DIRECTION_NORMAL_RIGHT : SwipeDirections.DIRECTION_NORMAL_LEFT);
                     else mDirection = (deltaX > 0 ? SwipeDirections.DIRECTION_FAR_RIGHT : SwipeDirections.DIRECTION_FAR_LEFT);
-                    mDownViewGroup.showBackground(mDirection);
+                    mDownViewGroup.showBackground(mDirection, mDimBackgrounds && (Math.abs(deltaX) < mViewWidth*mNormalSwipeFraction));
 
                     mDownView.setTranslationX(deltaX - mSwipingSlop);
                     if(mFadeOut) mDownView.setAlpha(Math.max(0f, Math.min(1f,
