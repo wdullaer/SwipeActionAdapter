@@ -230,10 +230,10 @@ Additional Options
 ### setFadeOut(boolean fadeOut)
 Setting this to true will cause the ListView item to slowly fade out as it is being swiped.
 
-### setFixedBackgrounds(boolean setFixedBackgrounds)
+### setFixedBackgrounds(boolean fixedBackgrounds)
 Setting this to true will make the backgrounds static behind the ListView item instead of sliding in from the side.
 
-### setDimBackgrounds(boolean setFixedBackgrounds)
+### setDimBackgrounds(boolean dimBackgrounds)
 Setting this to true will make the backgrounds appear dimmed before the normal swipe threshold is reached.
 
 ### setNormalSwipeFraction(float normalSwipeFraction)
