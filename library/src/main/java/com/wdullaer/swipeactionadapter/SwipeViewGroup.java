@@ -87,13 +87,15 @@ public class SwipeViewGroup extends FrameLayout {
      * Show the View linked to a key. Don't do anything if the key is not found
      *
      * @param direction The key of the View to be shown
+     * @param dimBackground Indicates whether the background should be dimmed
      */
-    public void showBackground(int direction){
+    public void showBackground(int direction, boolean dimBackground){
         if(mBackgroundMap.get(direction) == null) return;
 
         if(visibleView != SwipeDirections.DIRECTION_NEUTRAL)
             mBackgroundMap.get(visibleView).setVisibility(View.INVISIBLE);
         mBackgroundMap.get(direction).setVisibility(View.VISIBLE);
+        mBackgroundMap.get(direction).setAlpha(dimBackground ? 0.4f : 1);
         visibleView = direction;
     }
 

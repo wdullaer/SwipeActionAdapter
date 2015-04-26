@@ -36,7 +36,9 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
     protected SwipeActionListener mSwipeActionListener;
     private boolean mFadeOut = false;
     private boolean mFixedBackgrounds = false;
+    private boolean mDimBackgrounds = false;
     private float mFarSwipeFraction = 0.5f;
+    private float mNormalSwipeFraction = 0.25f;
 
     protected SparseIntArray mBackgroundResIds = new SparseIntArray();
 
@@ -119,12 +121,25 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
      * Set whether the backgrounds should be fixed or swipe in from the side
      * The default value for this property is false: backgrounds will swipe in
      *
-     * @param mFixedBackgrounds true for fixed backgrounds, false for swipe in
+     * @param fixedBackgrounds true for fixed backgrounds, false for swipe in
      */
     @SuppressWarnings("unused")
-    public SwipeActionAdapter setFixedBackgrounds(boolean mFixedBackgrounds){
-        this.mFixedBackgrounds = mFixedBackgrounds;
-        if(mListView != null) mTouchListener.setFixedBackgrounds(mFixedBackgrounds);
+    public SwipeActionAdapter setFixedBackgrounds(boolean fixedBackgrounds){
+        this.mFixedBackgrounds = fixedBackgrounds;
+        if(mListView != null) mTouchListener.setFixedBackgrounds(fixedBackgrounds);
+        return this;
+    }
+
+    /**
+     * Set whether the backgrounds should be dimmed when in no-trigger zone
+     * The default value for this property is false: backgrounds will not dim
+     *
+     * @param dimBackgrounds true for dimmed backgrounds, false for no opacity change
+     */
+    @SuppressWarnings("unused")
+    public SwipeActionAdapter setDimBackgrounds(boolean dimBackgrounds){
+        this.mDimBackgrounds = dimBackgrounds;
+        if(mListView != null) mTouchListener.setDimBackgrounds(dimBackgrounds);
         return this;
     }
 
@@ -138,25 +153,43 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
         if(farSwipeFraction < 0 || farSwipeFraction > 1) {
             throw new IllegalArgumentException("Must be a float between 0 and 1");
         }
-        mFarSwipeFraction = farSwipeFraction;
-        if(mListView != null) mTouchListener.setFarSwipeFraction(mFarSwipeFraction);
+        this.mFarSwipeFraction = farSwipeFraction;
+        if(mListView != null) mTouchListener.setFarSwipeFraction(farSwipeFraction);
+        return this;
+    }
+
+    /**
+     * Set the fraction of the View Width that needs to be swiped before it is counted as a normal swipe
+     *
+     * @param normalSwipeFraction float between 0 and 1
+     */
+    @SuppressWarnings("unused")
+    public SwipeActionAdapter setNormalSwipeFraction(float normalSwipeFraction) {
+        if(normalSwipeFraction < 0 || normalSwipeFraction > 1) {
+            throw new IllegalArgumentException("Must be a float between 0 and 1");
+        }
+        this.mNormalSwipeFraction = normalSwipeFraction;
+        if(mListView != null) mTouchListener.setNormalSwipeFraction(normalSwipeFraction);
         return this;
     }
 
     /**
      * We need the ListView to be able to modify it's OnTouchListener
      *
-     * @param mListView the ListView to which the adapter will be attached
+     * @param listView the ListView to which the adapter will be attached
      * @return A reference to the current instance so that commands can be chained
      */
-    public SwipeActionAdapter setListView(ListView mListView){
-        this.mListView = mListView;
-        mTouchListener = new SwipeActionTouchListener(mListView,this);
+    public SwipeActionAdapter setListView(ListView listView){
+        this.mListView = listView;
+        mTouchListener = new SwipeActionTouchListener(listView,this);
         this.mListView.setOnTouchListener(mTouchListener);
         this.mListView.setOnScrollListener(mTouchListener.makeScrollListener());
         this.mListView.setClipChildren(false);
         mTouchListener.setFadeOut(mFadeOut);
+        mTouchListener.setDimBackgrounds(mDimBackgrounds);
         mTouchListener.setFixedBackgrounds(mFixedBackgrounds);
+        mTouchListener.setNormalSwipeFraction(mNormalSwipeFraction);
+        mTouchListener.setFarSwipeFraction(mFarSwipeFraction);
         return this;
     }
 
