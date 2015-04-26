@@ -52,6 +52,7 @@ public class MainActivity extends ListActivity implements
         );
         mAdapter = new SwipeActionAdapter(stringAdapter);
         mAdapter.setSwipeActionListener(this)
+                .setDimBackgrounds(true)
                 .setListView(getListView());
         setListAdapter(mAdapter);
 
