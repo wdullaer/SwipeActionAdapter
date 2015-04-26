@@ -24,12 +24,12 @@ There are multiple options to add SwipeActionAdapter to your project:
 Add it as a dependency to your `build.gradle`
 ```java
 dependencies {
-    compile 'com.wdullaer:swipeactionadapter:1.3.2'
+    compile 'com.wdullaer:swipeactionadapter:1.4.0'
 }
 ```
 
 * **Jar File**  
-[Download the jar file](https://github.com/wdullaer/SwipeActionAdapter/releases) and add it to your project
+[Download the jar file](https://github.com/wdullaer/SwipeActionAdapter/releases/latest) and add it to your project
 
 * **Build from source**  
 If you would like to get the most recent code in a jar, clone the project and run ```./gradlew jar``` from
