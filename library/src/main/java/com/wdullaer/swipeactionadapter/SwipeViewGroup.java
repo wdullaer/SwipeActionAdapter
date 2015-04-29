@@ -43,6 +43,7 @@ public class SwipeViewGroup extends FrameLayout {
      */
     public SwipeViewGroup(Context context) {
         super(context);
+        initialize();
     }
 
     /**
@@ -53,6 +54,7 @@ public class SwipeViewGroup extends FrameLayout {
      */
     public SwipeViewGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
+        initialize();
     }
 
     /**
@@ -64,6 +66,11 @@ public class SwipeViewGroup extends FrameLayout {
      */
     public SwipeViewGroup(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        initialize();
+    }
+
+    private void initialize() {
+        setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);
     }
 
     /**
@@ -78,7 +85,7 @@ public class SwipeViewGroup extends FrameLayout {
         if(mBackgroundMap.get(direction) != null) removeView(mBackgroundMap.get(direction));
 
         background.setVisibility(View.INVISIBLE);
-        mBackgroundMap.put(direction,background);
+        mBackgroundMap.put(direction, background);
         addView(background);
         return this;
     }
