@@ -69,7 +69,12 @@ public class SwipeViewGroup extends FrameLayout {
         initialize();
     }
 
+    /**
+     * Common code for all the constructors
+     */
     private void initialize() {
+        // Allows click events to reach the ListView in case the row has a clickable View like a Button
+        // FIXME: probably messes with accessibility. Doesn't fix root cause (see onTouchEvent)
         setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);
     }
 
