@@ -24,6 +24,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import java.util.List;
+
 /**
  * Class to hold a ListView item and the swipe backgrounds
  *
@@ -109,6 +111,18 @@ public class SwipeViewGroup extends FrameLayout {
         mBackgroundMap.get(direction).setVisibility(View.VISIBLE);
         mBackgroundMap.get(direction).setAlpha(dimBackground ? 0.4f : 1);
         visibleView = direction;
+    }
+
+    /**
+     * Hide all of the directional backgrounds
+     *
+     */
+    public void hideBackgrounds() {
+        List<Integer> directions = SwipeDirections.getAllDirections();
+        for (int direction: directions) {
+            View view = mBackgroundMap.get(direction);
+            if (view != null) view.setVisibility(INVISIBLE);
+        }
     }
 
     /**

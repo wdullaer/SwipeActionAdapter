@@ -296,11 +296,17 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
 
                 if (mDownView != null && mSwiping) {
                     // cancel
+                    final int downPosition = mDownPosition;
                     mDownView.animate()
                             .translationX(0)
                             .alpha(1)
                             .setDuration(mAnimationTime)
-                            .setListener(null);
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    resetBackgrounds(downPosition);
+                                }
+                            });
                 }
                 mVelocityTracker.recycle();
                 mVelocityTracker = null;
@@ -360,11 +366,17 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                             });
                 } else {
                     // cancel
+                    final int downPosition = mDownPosition;
                     mDownView.animate()
                             .translationX(0)
                             .alpha(1)
                             .setDuration(mAnimationTime)
-                            .setListener(null);
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    resetBackgrounds(downPosition);
+                                }
+                            });
                 }
                 mVelocityTracker.recycle();
                 mVelocityTracker = null;
@@ -417,6 +429,16 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
             }
         }
         return false;
+    }
+
+    private void resetBackgrounds(int position) {
+        int firstVisiblePosition = mListView.getFirstVisiblePosition();
+        int lastVisiblePosition = mListView.getLastVisiblePosition();
+        if (position >= firstVisiblePosition && position <= lastVisiblePosition) {
+            // We need to prevent the swipe background from showing through once swipe is complete
+            SwipeViewGroup swipeViewGroup = (SwipeViewGroup) mListView.getChildAt(position - firstVisiblePosition);
+            swipeViewGroup.hideBackgrounds();
+        }
     }
 
     class PendingDismissData implements Comparable<PendingDismissData> {
@@ -510,6 +532,9 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                     mListView.dispatchTouchEvent(cancelEvent);
 
                     mPendingDismisses.clear();
+                    for (int position: dismissPositions) {
+                        resetBackgrounds(position);
+                    }
                 }
             }
         };
