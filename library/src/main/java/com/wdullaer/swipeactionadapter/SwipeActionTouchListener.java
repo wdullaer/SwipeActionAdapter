@@ -300,7 +300,12 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                             .translationX(0)
                             .alpha(1)
                             .setDuration(mAnimationTime)
-                            .setListener(null);
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    mDownViewGroup.showBackground(SwipeDirections.DIRECTION_NEUTRAL, false);
+                                }
+                            });
                 }
                 mVelocityTracker.recycle();
                 mVelocityTracker = null;
@@ -364,7 +369,12 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                             .translationX(0)
                             .alpha(1)
                             .setDuration(mAnimationTime)
-                            .setListener(null);
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    mDownViewGroup.showBackground(SwipeDirections.DIRECTION_NEUTRAL, false);
+                                }
+                            });
                 }
                 mVelocityTracker.recycle();
                 mVelocityTracker = null;
@@ -508,6 +518,8 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                     MotionEvent cancelEvent = MotionEvent.obtain(time, time,
                             MotionEvent.ACTION_CANCEL, 0, 0, 0);
                     mListView.dispatchTouchEvent(cancelEvent);
+
+                    mDownViewGroup.showBackground(SwipeDirections.DIRECTION_NEUTRAL, false);
 
                     mPendingDismisses.clear();
                 }

@@ -102,12 +102,15 @@ public class SwipeViewGroup extends FrameLayout {
      * @param dimBackground Indicates whether the background should be dimmed
      */
     public void showBackground(int direction, boolean dimBackground){
-        if(mBackgroundMap.get(direction) == null) return;
+        if(SwipeDirections.DIRECTION_NEUTRAL != direction && mBackgroundMap.get(direction) == null) return;
 
-        if(visibleView != SwipeDirections.DIRECTION_NEUTRAL)
+        if(SwipeDirections.DIRECTION_NEUTRAL != visibleView)
             mBackgroundMap.get(visibleView).setVisibility(View.INVISIBLE);
-        mBackgroundMap.get(direction).setVisibility(View.VISIBLE);
-        mBackgroundMap.get(direction).setAlpha(dimBackground ? 0.4f : 1);
+        if(SwipeDirections.DIRECTION_NEUTRAL != direction) {
+            mBackgroundMap.get(direction).setVisibility(View.VISIBLE);
+            mBackgroundMap.get(direction).setAlpha(dimBackground ? 0.4f : 1);
+        }
+
         visibleView = direction;
     }
 
