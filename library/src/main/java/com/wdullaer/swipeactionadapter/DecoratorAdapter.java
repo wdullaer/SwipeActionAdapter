@@ -95,8 +95,7 @@ public class DecoratorAdapter extends BaseAdapter {
 
     @Override
     public void notifyDataSetChanged(){
-        // ArrayAdapter does this himself
-        if(!(mBaseAdapter instanceof ArrayAdapter<?>)) mBaseAdapter.notifyDataSetChanged();
+        mBaseAdapter.notifyDataSetChanged();
     }
 
     @Override
