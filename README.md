@@ -24,7 +24,7 @@ There are multiple options to add SwipeActionAdapter to your project:
 Add it as a dependency to your `build.gradle`
 ```java
 dependencies {
-    compile 'com.wdullaer:swipeactionadapter:1.4.2'
+    compile 'com.wdullaer:swipeactionadapter:1.4.3'
 }
 ```
 
@@ -127,7 +127,6 @@ Layout code
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="?android:listPreferredItemHeight"
     android:background="@android:color/holo_blue_bright">
-
 </LinearLayout>
 ```
 
