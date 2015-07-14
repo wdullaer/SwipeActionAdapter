@@ -24,7 +24,7 @@ There are multiple options to add SwipeActionAdapter to your project:
 Add it as a dependency to your `build.gradle`
 ```java
 dependencies {
-    compile 'com.wdullaer:swipeactionadapter:1.4.3'
+    compile 'com.wdullaer:swipeactionadapter:1.4.4'
 }
 ```
 
