@@ -200,7 +200,7 @@ public class SwipeViewGroup extends FrameLayout implements Checkable {
     @Override
     public void setChecked(boolean checked) {
         this.checked = checked;
-        if ( contentView != null && contentView instanceof Checkable ) {
+        if (contentView != null && contentView instanceof Checkable) {
             ((Checkable)contentView).setChecked(checked);
         }
     }
@@ -212,6 +212,6 @@ public class SwipeViewGroup extends FrameLayout implements Checkable {
 
     @Override
     public void toggle() {
-        this.setChecked( ! checked );
+        this.setChecked(!checked);
     }
 }
