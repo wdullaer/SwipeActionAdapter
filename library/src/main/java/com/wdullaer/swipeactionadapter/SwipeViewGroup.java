@@ -22,6 +22,7 @@ import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Checkable;
 import android.widget.FrameLayout;
 
 /**
@@ -29,12 +30,13 @@ import android.widget.FrameLayout;
  *
  * Created by wdullaer on 22.06.14.
  */
-public class SwipeViewGroup extends FrameLayout {
+public class SwipeViewGroup extends FrameLayout implements Checkable {
     private View contentView = null;
 
     private int visibleView = SwipeDirections.DIRECTION_NEUTRAL;
     private SparseArray<View> mBackgroundMap = new SparseArray<>();
     private OnTouchListener swipeTouchListener;
+    private boolean checked;
 
     /**
      * Standard android View constructor
@@ -193,5 +195,23 @@ public class SwipeViewGroup extends FrameLayout {
     public boolean onTouchEvent(@NonNull MotionEvent ev) {
         // Finish the swipe gesture: our parent will no longer do it if this function is called
         return swipeTouchListener.onTouch(this, ev);
+    }
+
+    @Override
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+        if ( contentView != null && contentView instanceof Checkable ) {
+            ((Checkable)contentView).setChecked(checked);
+        }
+    }
+
+    @Override
+    public boolean isChecked() {
+        return checked;
+    }
+
+    @Override
+    public void toggle() {
+        this.setChecked( ! checked );
     }
 }
