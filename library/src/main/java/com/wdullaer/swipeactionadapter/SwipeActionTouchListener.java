@@ -101,6 +101,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
     private boolean mPaused;
     private int mDirection;
     private boolean mFar;
+    private List<Integer> mEnabledDirections = new ArrayList<>();
 
     /**
      * The callback interface used by {@link SwipeActionTouchListener} to inform its client
@@ -237,6 +238,16 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
         mNormalSwipeFraction = normalSwipeFraction;
     }
 
+    /**
+     * Enable a swipe direction (none are enabled by default)
+     *
+     * @param direction Integer const from SwipeDirections
+     */
+    protected void addEnabledDirection(Integer direction) {
+        if(!this.mEnabledDirections.contains(direction))
+            this.mEnabledDirections.add(direction);
+    }
+    
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         if (mViewWidth < 2) {
@@ -332,14 +343,16 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                 float absVelocityY = Math.abs(mVelocityTracker.getYVelocity());
                 boolean dismiss = false;
                 boolean dismissRight = false;
-                if (Math.abs(deltaX) > (mViewWidth * mNormalSwipeFraction) && mSwiping) {
-                    dismiss = true;
-                    dismissRight = deltaX > 0;
-                } else if (mMinFlingVelocity <= absVelocityX && absVelocityX <= mMaxFlingVelocity
-                        && absVelocityY < absVelocityX && mSwiping) {
-                    // dismiss only if flinging in the same direction as dragging
-                    dismiss = (velocityX < 0) == (deltaX < 0);
-                    dismissRight = mVelocityTracker.getXVelocity() > 0;
+                if(mEnabledDirections.contains(mDirection)) {
+                    if (Math.abs(deltaX) > (mViewWidth * mNormalSwipeFraction) && mSwiping) {
+                        dismiss = true;
+                        dismissRight = deltaX > 0;
+                    } else if (mMinFlingVelocity <= absVelocityX && absVelocityX <= mMaxFlingVelocity
+                            && absVelocityY < absVelocityX && mSwiping) {
+                        // dismiss only if flinging in the same direction as dragging
+                        dismiss = (velocityX < 0) == (deltaX < 0);
+                        dismissRight = mVelocityTracker.getXVelocity() > 0;
+                    }
                 }
                 if (dismiss && mDownPosition != ListView.INVALID_POSITION) {
                     // dismiss
@@ -416,12 +429,13 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                     if(!mFar && Math.abs(deltaX) > mViewWidth*mFarSwipeFraction) mFar = true;
                     if(!mFar) mDirection = (deltaX > 0 ? SwipeDirections.DIRECTION_NORMAL_RIGHT : SwipeDirections.DIRECTION_NORMAL_LEFT);
                     else mDirection = (deltaX > 0 ? SwipeDirections.DIRECTION_FAR_RIGHT : SwipeDirections.DIRECTION_FAR_LEFT);
-                    mDownViewGroup.showBackground(mDirection, mDimBackgrounds && (Math.abs(deltaX) < mViewWidth*mNormalSwipeFraction));
-
-                    mDownView.setTranslationX(deltaX - mSwipingSlop);
-                    if(mFadeOut) mDownView.setAlpha(Math.max(0f, Math.min(1f,
-                                1f - 2f * Math.abs(deltaX) / mViewWidth)));
-                    return true;
+                    if(mEnabledDirections.contains(mDirection)) {
+                        mDownViewGroup.showBackground(mDirection, mDimBackgrounds && (Math.abs(deltaX) < mViewWidth*mNormalSwipeFraction));
+                        mDownView.setTranslationX(deltaX - mSwipingSlop);
+                        if(mFadeOut) mDownView.setAlpha(Math.max(0f, Math.min(1f,
+                                    1f - 2f * Math.abs(deltaX) / mViewWidth)));
+                        return true;
+                    }
                 }
                 break;
             }
