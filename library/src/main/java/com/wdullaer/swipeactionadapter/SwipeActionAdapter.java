@@ -174,6 +174,17 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
     }
 
     /**
+     * Enable a swipe direction (none are enabled by default)
+     * Automatically adds on addBackground
+     *
+     * @param direction Integer const from SwipeDirections
+     */
+    public SwipeActionAdapter addEnabledDirection(Integer direction) {
+        mTouchListener.addEnabledDirection(direction);
+        return this;
+    }
+    
+    /**
      * We need the ListView to be able to modify it's OnTouchListener
      *
      * @param listView the ListView to which the adapter will be attached
@@ -212,7 +223,10 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
      * @return A reference to the current instance so that commands can be chained
      */
     public SwipeActionAdapter addBackground(int key, int resId){
-        if(SwipeDirections.getAllDirections().contains(key)) mBackgroundResIds.put(key,resId);
+        if(SwipeDirections.getAllDirections().contains(key)) {
+            mBackgroundResIds.put(key,resId);
+            addEnabledDirection(key);
+        }
         return this;
     }
 
