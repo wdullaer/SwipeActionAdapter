@@ -448,13 +448,13 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
     }
 
     private void slideBack(final View slideInView, final int downPosition, final int direction){
-        mPendingDismisses.add(new PendingDismissData(downPosition,direction,slideInView));
+        mPendingDismisses.add(new PendingDismissData(downPosition, direction, slideInView));
         slideInView.setTranslationX(slideInView.getTranslationX());
         slideInView.animate()
                 .translationX(0)
                 .alpha(1)
                 .setDuration(mAnimationTime)
-                .setListener(createAnimatorListener(slideInView.getHeight()));
+                .setListener(createAnimatorListener());
     }
 
     private void performDismiss(final View dismissView, final int dismissPosition, final int direction) {
@@ -467,7 +467,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
 
         ValueAnimator animator = ValueAnimator.ofInt(originalHeight, 1).setDuration(mAnimationTime);
 
-        animator.addListener(createAnimatorListener(originalHeight));
+        animator.addListener(createAnimatorListener());
 
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -481,7 +481,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
         animator.start();
     }
 
-    private AnimatorListenerAdapter createAnimatorListener(final int originalHeight){
+    private AnimatorListenerAdapter createAnimatorListener(){
         return new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -503,14 +503,12 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                     // animation with a stale position
                     mDownPosition = ListView.INVALID_POSITION;
 
-                    ViewGroup.LayoutParams lp;
+                    
                     for (PendingDismissData pendingDismiss : mPendingDismisses) {
                         // Reset view presentation
                         pendingDismiss.view.setAlpha(1f);
                         pendingDismiss.view.setTranslationX(0);
-                        lp = pendingDismiss.view.getLayoutParams();
-                        lp.height = originalHeight;
-                        pendingDismiss.view.setLayoutParams(lp);
+                        pendingDismiss.view.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
                     }
 
                     // Send a cancel event
