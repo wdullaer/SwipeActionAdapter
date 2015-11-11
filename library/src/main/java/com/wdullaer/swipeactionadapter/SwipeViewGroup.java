@@ -38,34 +38,16 @@ public class SwipeViewGroup extends FrameLayout implements Checkable {
     private OnTouchListener swipeTouchListener;
     private boolean checked;
 
-    /**
-     * Standard android View constructor
-     *
-     * @param context
-     */
     public SwipeViewGroup(Context context) {
         super(context);
         initialize();
     }
 
-    /**
-     * Standard android View constructor
-     *
-     * @param context
-     * @param attrs
-     */
     public SwipeViewGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
         initialize();
     }
 
-    /**
-     * Standard android View constructor
-     *
-     * @param context
-     * @param attrs
-     * @param defStyle
-     */
     public SwipeViewGroup(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initialize();
