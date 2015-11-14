@@ -84,9 +84,9 @@ protected void onCreate(Bundle savedInstanceState) {
 ### Create a  background layout for each swipe direction
 
 I'm just supplying an empty layout with a background for each direction.
-You should have a layout for at least ```SwipeDirections.DIRECTION_NORMAL_LEFT``` and ```SwipeDirections.DIRECTION_NORMAL_RIGHT```.
+You should have a layout for at least ```SwipeDirection.DIRECTION_NORMAL_LEFT``` and ```SwipeDirection.DIRECTION_NORMAL_RIGHT```.
 The other directions are optional.
-It is important that the background layouts have the same height as the normal row layout.
+It is important that the background layouts scale properly vertically.
 The ```onCreate``` callback from the previous section now becomes:
 
 ```java
@@ -113,10 +113,10 @@ protected void onCreate(Bundle savedInstanceState) {
     setListAdapter(mAdapter);
 
     // Set backgrounds for the swipe directions
-    mAdapter.addBackground(SwipeDirections.DIRECTION_FAR_LEFT,R.layout.row_bg_left_far)
-            .addBackground(SwipeDirections.DIRECTION_NORMAL_LEFT,R.layout.row_bg_left)
-            .addBackground(SwipeDirections.DIRECTION_FAR_RIGHT,R.layout.row_bg_right_far)
-            .addBackground(SwipeDirections.DIRECTION_NORMAL_RIGHT,R.layout.row_bg_right);
+    mAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT,R.layout.row_bg_left_far)
+            .addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT,R.layout.row_bg_left)
+            .addBackground(SwipeDirection.DIRECTION_FAR_RIGHT,R.layout.row_bg_right_far)
+            .addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT,R.layout.row_bg_right);
 }
 ```
 
@@ -134,11 +134,11 @@ Layout code
 
 The final thing to do is listen to swipe gestures. This is done by implementing the ```SwipeActionListener```.
 This interface has three methods:
-* ```boolean hasActions(int position)```: return true if you want this item to be swipeable
-* ```boolean shouldDismiss(int position, int direction)```: return true if you want the item to be dismissed,
+* ```boolean hasActions(int position, SwipeDirection direction)```: return true if you want this item to be swipeable in this direction
+* ```boolean shouldDismiss(int position, SwipeDirection direction)```: return true if you want the item to be dismissed,
 return false if it should stay visible. This method runs on the interface thread so if you want to trigger any
 heavy actions here, put them on an ```ASyncThread```
-* ```void onSwipe(int[] position, int[] direction)```: triggered when all animations on the swiped items have finished.
+* ```void onSwipe(int[] position, SwipeDirection[] direction)```: triggered when all animations on the swiped items have finished.
 You will receive an array of all swiped items, sorted in descending order with their corresponding directions.
 
 You should pass a reference of your ```SwipeActionListener``` to the ```SwipeActionAdapter```
@@ -168,43 +168,44 @@ protected void onCreate(Bundle savedInstanceState) {
     setListAdapter(mAdapter);
 
     // Set backgrounds for the swipe directions
-    mAdapter.addBackground(SwipeDirections.DIRECTION_FAR_LEFT,R.layout.row_bg_left_far)
-            .addBackground(SwipeDirections.DIRECTION_NORMAL_LEFT,R.layout.row_bg_left)
-            .addBackground(SwipeDirections.DIRECTION_FAR_RIGHT,R.layout.row_bg_right_far)
-            .addBackground(SwipeDirections.DIRECTION_NORMAL_RIGHT,R.layout.row_bg_right);
+    mAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT,R.layout.row_bg_left_far)
+            .addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT,R.layout.row_bg_left)
+            .addBackground(SwipeDirection.DIRECTION_FAR_RIGHT,R.layout.row_bg_right_far)
+            .addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT,R.layout.row_bg_right);
 
     // Listen to swipes
     mAdapter.setSwipeActionListener(new SwipeActionListener(){
         @Override
-        public boolean hasActions(int position){
-            // All items can be swiped
-            return true;
+        public boolean hasActions(int position, SwipeDirection direction){
+            if(direction.isLeft()) return true; // Change this to false to disable left swipes
+            if(direction.isRight()) return true;
+            return false;
         }
 
         @Override
-        public boolean shouldDismiss(int position, int direction){
+        public boolean shouldDismiss(int position, SwipeDirection direction){
             // Only dismiss an item when swiping normal left
-            return direction == SwipeDirections.DIRECTION_NORMAL_LEFT;
+            return direction == SwipeDirection.DIRECTION_NORMAL_LEFT;
         }
 
         @Override
-        public void onSwipe(int[] positionList, int[] directionList){
+        public void onSwipe(int[] positionList, SwipeDirection[] directionList){
             for(int i=0;i<positionList.length;i++) {
                 int direction = directionList[i];
                 int position = positionList[i];
                 String dir = "";
 
                 switch (direction) {
-                    case SwipeDirections.DIRECTION_FAR_LEFT:
+                    case SwipeDirection.DIRECTION_FAR_LEFT:
                         dir = "Far left";
                         break;
-                    case SwipeDirections.DIRECTION_NORMAL_LEFT:
+                    case SwipeDirection.DIRECTION_NORMAL_LEFT:
                         dir = "Left";
                         break;
-                    case SwipeDirections.DIRECTION_FAR_RIGHT:
+                    case SwipeDirection.DIRECTION_FAR_RIGHT:
                         dir = "Far right";
                         break;
-                    case SwipeDirections.DIRECTION_NORMAL_RIGHT:
+                    case SwipeDirection.DIRECTION_NORMAL_RIGHT:
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
                         builder.setTitle("Test Dialog").setMessage("You swiped right").create().show();
                         dir = "Right";

@@ -16,12 +16,14 @@
 
 package com.wdullaer.swipeactionadapter;
 
-import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Adapter that adds support for multiple swipe actions to your ListView
@@ -40,7 +42,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
     private float mFarSwipeFraction = 0.5f;
     private float mNormalSwipeFraction = 0.25f;
 
-    protected SparseIntArray mBackgroundResIds = new SparseIntArray();
+    protected HashMap<SwipeDirection, Integer> mBackgroundResIds = new HashMap<>();
 
     public SwipeActionAdapter(BaseAdapter baseAdapter){
         super(baseAdapter);
@@ -52,8 +54,8 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
 
         if(output == null) {
             output = new SwipeViewGroup(parent.getContext());
-            for (int i = 0; i < mBackgroundResIds.size(); i++) {
-                output.addBackground(View.inflate(parent.getContext(),mBackgroundResIds.valueAt(i), null),mBackgroundResIds.keyAt(i));
+            for(Map.Entry<SwipeDirection, Integer> entry : mBackgroundResIds.entrySet()) {
+                output.addBackground(View.inflate(parent.getContext(), entry.getValue(), null), entry.getKey());
             }
             output.setSwipeTouchListener(mTouchListener);
         }
@@ -68,11 +70,12 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
      * We just link it through to our own interface
      *
      * @param position the position of the item that was swiped
+     * @param direction the direction in which the swipe has happened
      * @return boolean indicating whether the item has actions
      */
     @Override
-    public boolean hasActions(int position){
-        return mSwipeActionListener != null && mSwipeActionListener.hasActions(position);
+    public boolean hasActions(int position, SwipeDirection direction){
+        return mSwipeActionListener != null && mSwipeActionListener.hasActions(position, direction);
     }
 
     /**
@@ -86,7 +89,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
      * @return boolean that indicates whether the list item should be dismissed or shown again.
      */
     @Override
-    public boolean onPreAction(ListView listView, int position, int direction){
+    public boolean onPreAction(ListView listView, int position, SwipeDirection direction){
         return mSwipeActionListener != null && mSwipeActionListener.shouldDismiss(position, direction);
     }
 
@@ -100,8 +103,8 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
      * @param direction The type of swipe that triggered the action.
      */
     @Override
-    public void onAction(ListView listView, int[] position, int[] direction){
-        if(mSwipeActionListener != null) mSwipeActionListener.onSwipe(position,direction);
+    public void onAction(ListView listView, int[] position, SwipeDirection[] direction){
+        if(mSwipeActionListener != null) mSwipeActionListener.onSwipe(position, direction);
     }
 
     /**
@@ -172,17 +175,6 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
         if(mListView != null) mTouchListener.setNormalSwipeFraction(normalSwipeFraction);
         return this;
     }
-
-    /**
-     * Enable a swipe direction (none are enabled by default)
-     * Automatically adds on addBackground
-     *
-     * @param direction Integer const from SwipeDirections
-     */
-    public SwipeActionAdapter addEnabledDirection(Integer direction) {
-        mTouchListener.addEnabledDirection(direction);
-        return this;
-    }
     
     /**
      * We need the ListView to be able to modify it's OnTouchListener
@@ -222,11 +214,8 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
      * @param resId the resource Id of the background to add
      * @return A reference to the current instance so that commands can be chained
      */
-    public SwipeActionAdapter addBackground(int key, int resId){
-        if(SwipeDirections.getAllDirections().contains(key)) {
-            mBackgroundResIds.put(key,resId);
-            addEnabledDirection(key);
-        }
+    public SwipeActionAdapter addBackground(SwipeDirection key, int resId){
+        if(SwipeDirection.getAllDirections().contains(key)) mBackgroundResIds.put(key,resId);
         return this;
     }
 
@@ -245,8 +234,8 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
      * Interface that listeners of swipe events should implement
      */
     public interface SwipeActionListener{
-        boolean hasActions(int position);
-        boolean shouldDismiss(int position, int direction);
-        void onSwipe(int[] position, int[] direction);
+        boolean hasActions(int position, SwipeDirection direction);
+        boolean shouldDismiss(int position, SwipeDirection direction);
+        void onSwipe(int[] position, SwipeDirection[] direction);
     }
 }

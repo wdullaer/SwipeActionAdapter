@@ -99,9 +99,8 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
     private View mDownView;
     private SwipeViewGroup mDownViewGroup;
     private boolean mPaused;
-    private int mDirection;
+    private SwipeDirection mDirection = SwipeDirection.DIRECTION_NEUTRAL;
     private boolean mFar;
-    private List<Integer> mEnabledDirections = new ArrayList<>();
 
     /**
      * The callback interface used by {@link SwipeActionTouchListener} to inform its client
@@ -112,9 +111,10 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
          * Called to determine whether the given position can be dismissed.
          *
          * @param position the position of the item that was swiped
+         * @param direction the direction in which the swipe happened
          * @return boolean indicating whether the item has actions
          */
-        boolean hasActions(int position);
+        boolean hasActions(int position, SwipeDirection direction);
 
         /**
          * Called when the user has swiped a list item position.
@@ -128,7 +128,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
          * @param direction The type of swipe that triggered the action
          * @return boolean that indicates whether the list item should be dismissed or shown again.
          */
-        boolean onPreAction(ListView listView, int position, int direction);
+        boolean onPreAction(ListView listView, int position, SwipeDirection direction);
 
         /**
          * Called after the dismiss or reappear animation of a swiped item has finished.
@@ -138,7 +138,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
          *                 for convenience.
          * @param direction The type of swipe that triggered the action
          */
-        void onAction(ListView listView, int[] position, int[] direction);
+        void onAction(ListView listView, int[] position, SwipeDirection[] direction);
     }
 
     /**
@@ -237,16 +237,6 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
     protected void setNormalSwipeFraction(float normalSwipeFraction) {
         mNormalSwipeFraction = normalSwipeFraction;
     }
-
-    /**
-     * Enable a swipe direction (none are enabled by default)
-     *
-     * @param direction Integer const from SwipeDirections
-     */
-    protected void addEnabledDirection(Integer direction) {
-        if(!this.mEnabledDirections.contains(direction))
-            this.mEnabledDirections.add(direction);
-    }
     
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -290,12 +280,8 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                     mDownX = motionEvent.getRawX();
                     mDownY = motionEvent.getRawY();
                     mDownPosition = mListView.getPositionForView(mDownView);
-                    if (mCallbacks.hasActions(mDownPosition)) {
-                        mVelocityTracker = VelocityTracker.obtain();
-                        mVelocityTracker.addMovement(motionEvent);
-                    } else {
-                        mDownView = null;
-                    }
+                    mVelocityTracker = VelocityTracker.obtain();
+                    mVelocityTracker.addMovement(motionEvent);
                 }
                 return false;
             }
@@ -314,7 +300,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                             .setListener(new AnimatorListenerAdapter() {
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
-                                    mDownViewGroup.showBackground(SwipeDirections.DIRECTION_NEUTRAL, false);
+                                    mDownViewGroup.showBackground(SwipeDirection.DIRECTION_NEUTRAL, false);
                                 }
                             });
                 }
@@ -325,7 +311,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                 mDownView = null;
                 mDownPosition = ListView.INVALID_POSITION;
                 mSwiping = false;
-                mDirection = SwipeDirections.DIRECTION_NEUTRAL;
+                mDirection = SwipeDirection.DIRECTION_NEUTRAL;
                 mFar = false;
                 break;
             }
@@ -343,7 +329,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                 float absVelocityY = Math.abs(mVelocityTracker.getYVelocity());
                 boolean dismiss = false;
                 boolean dismissRight = false;
-                if(mEnabledDirections.contains(mDirection)) {
+                if(mCallbacks.hasActions(mDownPosition, mDirection)) {
                     if (Math.abs(deltaX) > (mViewWidth * mNormalSwipeFraction) && mSwiping) {
                         dismiss = true;
                         dismissRight = deltaX > 0;
@@ -358,7 +344,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                     // dismiss
                     final View downView = mDownView; // mDownView gets null'd before animation ends
                     final int downPosition = mDownPosition;
-                    final int direction = mDirection;
+                    final SwipeDirection direction = mDirection;
                     ++mDismissAnimationRefCount;
                     mDownView.animate()
                             .translationX(dismissRight ? mViewWidth : -mViewWidth)
@@ -385,18 +371,18 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                             .setListener(new AnimatorListenerAdapter() {
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
-                                    mDownViewGroup.showBackground(SwipeDirections.DIRECTION_NEUTRAL, false);
+                                    mDownViewGroup.showBackground(SwipeDirection.DIRECTION_NEUTRAL, false);
                                 }
                             });
                 }
-                mVelocityTracker.recycle();
+                if(mVelocityTracker != null) mVelocityTracker.recycle();
                 mVelocityTracker = null;
                 mDownX = 0;
                 mDownY = 0;
                 mDownView = null;
                 mDownPosition = ListView.INVALID_POSITION;
                 mSwiping = false;
-                mDirection = SwipeDirections.DIRECTION_NEUTRAL;
+                mDirection = SwipeDirection.DIRECTION_NEUTRAL;
                 mFar = false;
                 break;
             }
@@ -425,11 +411,11 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                 }
 
                 if (mSwiping) {
-                    if(mDirection*deltaX < 0) mFar = false;
+                    if(mDirection.isLeft() && deltaX > 0 || mDirection.isRight() && deltaX < 0) mFar = false;
                     if(!mFar && Math.abs(deltaX) > mViewWidth*mFarSwipeFraction) mFar = true;
-                    if(!mFar) mDirection = (deltaX > 0 ? SwipeDirections.DIRECTION_NORMAL_RIGHT : SwipeDirections.DIRECTION_NORMAL_LEFT);
-                    else mDirection = (deltaX > 0 ? SwipeDirections.DIRECTION_FAR_RIGHT : SwipeDirections.DIRECTION_FAR_LEFT);
-                    if(mEnabledDirections.contains(mDirection)) {
+                    if(!mFar) mDirection = (deltaX > 0 ? SwipeDirection.DIRECTION_NORMAL_RIGHT : SwipeDirection.DIRECTION_NORMAL_LEFT);
+                    else mDirection = (deltaX > 0 ? SwipeDirection.DIRECTION_FAR_RIGHT : SwipeDirection.DIRECTION_FAR_LEFT);
+                    if(mCallbacks.hasActions(mDownPosition, mDirection)) {
                         mDownViewGroup.showBackground(mDirection, mDimBackgrounds && (Math.abs(deltaX) < mViewWidth*mNormalSwipeFraction));
                         mDownView.setTranslationX(deltaX - mSwipingSlop);
                         if(mFadeOut) mDownView.setAlpha(Math.max(0f, Math.min(1f,
@@ -445,10 +431,10 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
 
     class PendingDismissData implements Comparable<PendingDismissData> {
         public int position;
-        public int direction;
+        public SwipeDirection direction;
         public View view;
 
-        public PendingDismissData(int position, int direction, View view) {
+        public PendingDismissData(int position, SwipeDirection direction, View view) {
             this.position = position;
             this.direction = direction;
             this.view = view;
@@ -461,7 +447,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
         }
     }
 
-    private void slideBack(final View slideInView, final int downPosition, final int direction){
+    private void slideBack(final View slideInView, final int downPosition, final SwipeDirection direction){
         mPendingDismisses.add(new PendingDismissData(downPosition, direction, slideInView));
         slideInView.setTranslationX(slideInView.getTranslationX());
         slideInView.animate()
@@ -471,7 +457,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                 .setListener(createAnimatorListener());
     }
 
-    private void performDismiss(final View dismissView, final int dismissPosition, final int direction) {
+    private void performDismiss(final View dismissView, final int dismissPosition, final SwipeDirection direction) {
         // Animate the dismissed list item to zero-height and fire the dismiss callback when
         // all dismissed list item animations have completed. This triggers layout on each animation
         // frame; in the future we may want to do something smarter and more performant.
@@ -506,7 +492,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                     Collections.sort(mPendingDismisses);
 
                     int[] dismissPositions = new int[mPendingDismisses.size()];
-                    int[] dismissDirections = new int [mPendingDismisses.size()];
+                    SwipeDirection[] dismissDirections = new SwipeDirection [mPendingDismisses.size()];
                     for (int i = mPendingDismisses.size() - 1; i >= 0; i--) {
                         dismissPositions[i] = mPendingDismisses.get(i).position;
                         dismissDirections[i] = mPendingDismisses.get(i).direction;
@@ -531,7 +517,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                             MotionEvent.ACTION_CANCEL, 0, 0, 0);
                     mListView.dispatchTouchEvent(cancelEvent);
 
-                    mDownViewGroup.showBackground(SwipeDirections.DIRECTION_NEUTRAL, false);
+                    mDownViewGroup.showBackground(SwipeDirection.DIRECTION_NEUTRAL, false);
 
                     mPendingDismisses.clear();
                 }

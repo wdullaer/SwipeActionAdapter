@@ -27,7 +27,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
-import com.wdullaer.swipeactionadapter.SwipeDirections;
+import com.wdullaer.swipeactionadapter.SwipeDirection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,11 +44,11 @@ public class MainActivity extends ListActivity implements
 
         String[] content = new String[20];
         for (int i=0;i<20;i++) content[i] = "Row "+(i+1);
-        ArrayAdapter<String> stringAdapter = new ArrayAdapter<String>(
+        ArrayAdapter<String> stringAdapter = new ArrayAdapter<>(
                 this,
                 R.layout.row_bg,
                 R.id.text,
-                new ArrayList<String>(Arrays.asList(content))
+                new ArrayList<>(Arrays.asList(content))
         );
         mAdapter = new SwipeActionAdapter(stringAdapter);
         mAdapter.setSwipeActionListener(this)
@@ -56,10 +56,10 @@ public class MainActivity extends ListActivity implements
                 .setListView(getListView());
         setListAdapter(mAdapter);
 
-        mAdapter.addBackground(SwipeDirections.DIRECTION_FAR_LEFT,R.layout.row_bg_left_far)
-                .addBackground(SwipeDirections.DIRECTION_NORMAL_LEFT,R.layout.row_bg_left)
-                .addBackground(SwipeDirections.DIRECTION_FAR_RIGHT,R.layout.row_bg_right_far)
-                .addBackground(SwipeDirections.DIRECTION_NORMAL_RIGHT,R.layout.row_bg_right);
+        mAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT,R.layout.row_bg_left_far)
+                .addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.row_bg_left)
+                .addBackground(SwipeDirection.DIRECTION_FAR_RIGHT, R.layout.row_bg_right_far)
+                .addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT,R.layout.row_bg_right);
     }
 
 
@@ -92,33 +92,35 @@ public class MainActivity extends ListActivity implements
     }
 
     @Override
-    public boolean hasActions(int position){
-        return true;
+    public boolean hasActions(int position, SwipeDirection direction){
+        if(direction.isLeft()) return true;
+        if(direction.isRight()) return true;
+        return false;
     }
 
     @Override
-    public boolean shouldDismiss(int position, int direction){
-        return direction == SwipeDirections.DIRECTION_NORMAL_LEFT;
+    public boolean shouldDismiss(int position, SwipeDirection direction){
+        return direction == SwipeDirection.DIRECTION_NORMAL_LEFT;
     }
 
     @Override
-    public void onSwipe(int[] positionList, int[] directionList){
+    public void onSwipe(int[] positionList, SwipeDirection[] directionList){
         for(int i=0;i<positionList.length;i++) {
-            int direction = directionList[i];
+            SwipeDirection direction = directionList[i];
             int position = positionList[i];
             String dir = "";
 
             switch (direction) {
-                case SwipeDirections.DIRECTION_FAR_LEFT:
+                case DIRECTION_FAR_LEFT:
                     dir = "Far left";
                     break;
-                case SwipeDirections.DIRECTION_NORMAL_LEFT:
+                case DIRECTION_NORMAL_LEFT:
                     dir = "Left";
                     break;
-                case SwipeDirections.DIRECTION_FAR_RIGHT:
+                case DIRECTION_FAR_RIGHT:
                     dir = "Far right";
                     break;
-                case SwipeDirections.DIRECTION_NORMAL_RIGHT:
+                case DIRECTION_NORMAL_RIGHT:
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("Test Dialog").setMessage("You swiped right").create().show();
                     dir = "Right";

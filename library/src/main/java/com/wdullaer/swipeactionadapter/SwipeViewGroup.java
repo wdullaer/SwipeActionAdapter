@@ -19,11 +19,13 @@ package com.wdullaer.swipeactionadapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Checkable;
 import android.widget.FrameLayout;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class to hold a ListView item and the swipe backgrounds
@@ -33,8 +35,8 @@ import android.widget.FrameLayout;
 public class SwipeViewGroup extends FrameLayout implements Checkable {
     private View contentView = null;
 
-    private int visibleView = SwipeDirections.DIRECTION_NEUTRAL;
-    private SparseArray<View> mBackgroundMap = new SparseArray<>();
+    private SwipeDirection visibleView = SwipeDirection.DIRECTION_NEUTRAL;
+    private HashMap<SwipeDirection, View> mBackgroundMap = new HashMap<>();
     private OnTouchListener swipeTouchListener;
     private boolean checked;
 
@@ -70,7 +72,7 @@ public class SwipeViewGroup extends FrameLayout implements Checkable {
      * @param direction The key to be used to find it again
      * @return A reference to the a layout so commands can be chained
      */
-    public SwipeViewGroup addBackground(View background, int direction){
+    public SwipeViewGroup addBackground(View background, SwipeDirection direction){
         if(mBackgroundMap.get(direction) != null) removeView(mBackgroundMap.get(direction));
 
         background.setVisibility(View.INVISIBLE);
@@ -85,12 +87,12 @@ public class SwipeViewGroup extends FrameLayout implements Checkable {
      * @param direction The key of the View to be shown
      * @param dimBackground Indicates whether the background should be dimmed
      */
-    public void showBackground(int direction, boolean dimBackground){
-        if(SwipeDirections.DIRECTION_NEUTRAL != direction && mBackgroundMap.get(direction) == null) return;
+    public void showBackground(SwipeDirection direction, boolean dimBackground){
+        if(SwipeDirection.DIRECTION_NEUTRAL != direction && mBackgroundMap.get(direction) == null) return;
 
-        if(SwipeDirections.DIRECTION_NEUTRAL != visibleView)
+        if(SwipeDirection.DIRECTION_NEUTRAL != visibleView)
             mBackgroundMap.get(visibleView).setVisibility(View.INVISIBLE);
-        if(SwipeDirections.DIRECTION_NEUTRAL != direction) {
+        if(SwipeDirection.DIRECTION_NEUTRAL != direction) {
             mBackgroundMap.get(direction).setVisibility(View.VISIBLE);
             mBackgroundMap.get(direction).setAlpha(dimBackground ? 0.4f : 1);
         }
@@ -126,10 +128,9 @@ public class SwipeViewGroup extends FrameLayout implements Checkable {
      */
     public void translateBackgrounds(){
         this.setClipChildren(false);
-        for(int i=0;i<mBackgroundMap.size();i++){
-            int key = mBackgroundMap.keyAt(i);
-            View value = mBackgroundMap.valueAt(i);
-            value.setTranslationX(-Integer.signum(key)*value.getWidth());
+        for(Map.Entry<SwipeDirection, View> entry : mBackgroundMap.entrySet()) {
+            int signum = entry.getKey().isLeft() ? 1 : -1;
+            entry.getValue().setTranslationX(signum*entry.getValue().getWidth());
         }
     }
 
