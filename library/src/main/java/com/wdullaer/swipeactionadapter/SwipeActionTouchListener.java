@@ -420,6 +420,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                         mDownView.setTranslationX(deltaX - mSwipingSlop);
                         if(mFadeOut) mDownView.setAlpha(Math.max(0f, Math.min(1f,
                                     1f - 2f * Math.abs(deltaX) / mViewWidth)));
+                        mListView.invalidate();
                         return true;
                     }
                 }
