@@ -39,6 +39,7 @@ public class SwipeViewGroup extends FrameLayout implements Checkable {
     private HashMap<SwipeDirection, View> mBackgroundMap = new HashMap<>();
     private OnTouchListener swipeTouchListener;
     private boolean checked;
+    private boolean activated;
 
     public SwipeViewGroup(Context context) {
         super(context);
@@ -191,6 +192,17 @@ public class SwipeViewGroup extends FrameLayout implements Checkable {
     @Override
     public boolean isChecked() {
         return checked;
+    }
+
+    @Override
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+        if (contentView != null) contentView.setActivated(activated);
+    }
+
+    @Override
+    public boolean isActivated() {
+        return activated;
     }
 
     @Override
