@@ -108,6 +108,32 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
     }
 
     /**
+     * Called once the user touches the screen and starts swiping in any direction
+     *
+     * @param listView  The originating {@link ListView}.
+     * @param position  The position to perform the action on, sorted in descending  order
+     *                  for convenience.
+     * @param direction The type of swipe that triggered the action
+     */
+    @Override
+    public void onSwipeStarted(ListView listView, int position, SwipeDirection direction) {
+        if(mSwipeActionListener != null) mSwipeActionListener.onSwipeStarted(listView, position, direction);
+    }
+
+    /**
+     * Called once the swiping motion ended (user lifted finger)
+     *
+     * @param listView  The originating {@link ListView}.
+     * @param position  The position to perform the action on, sorted in descending  order
+     *                  for convenience.
+     * @param direction The type of swipe that triggered the action
+     */
+    @Override
+    public void onSwipeEnded(ListView listView, int position, SwipeDirection direction) {
+        if(mSwipeActionListener != null) mSwipeActionListener.onSwipeEnded(listView, position, direction);
+    }
+
+    /**
      * Set whether items should have a fadeOut animation
      *
      * @param mFadeOut true makes items fade out with a swipe (opacity -> 0)
@@ -175,7 +201,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
         if(mListView != null) mTouchListener.setNormalSwipeFraction(normalSwipeFraction);
         return this;
     }
-    
+
     /**
      * We need the ListView to be able to modify it's OnTouchListener
      *
@@ -237,5 +263,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
         boolean hasActions(int position, SwipeDirection direction);
         boolean shouldDismiss(int position, SwipeDirection direction);
         void onSwipe(int[] position, SwipeDirection[] direction);
+        void onSwipeStarted(ListView listView, int position, SwipeDirection direction);
+        void onSwipeEnded(ListView listView, int position, SwipeDirection direction);
     }
 }

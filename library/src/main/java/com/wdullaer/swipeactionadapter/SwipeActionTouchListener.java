@@ -139,6 +139,24 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
          * @param direction The type of swipe that triggered the action
          */
         void onAction(ListView listView, int[] position, SwipeDirection[] direction);
+
+        /**
+         * Called once the user touches the screen and starts swiping in any direction
+         *
+         * @param listView The originating {@link ListView}.
+         * @param position The position the user is swiping at
+         * @param direction The type of swipe that triggered the action
+         */
+        void onSwipeStarted(ListView listView, int position, SwipeDirection direction);
+
+        /**
+         * Called once the swiping motion ended (user lifted finger from the screen)
+         *
+         * @param listView The originating {@link ListView}.
+         * @param position The position started swiping on
+         * @param direction The type of swipe that triggered the action
+         */
+        void onSwipeEnded(ListView listView, int position, SwipeDirection direction);
     }
 
     /**
@@ -320,7 +338,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                 if (mVelocityTracker == null) {
                     break;
                 }
-
+                mCallbacks.onSwipeEnded(mListView, mDownPosition, mDirection);
                 float deltaX = motionEvent.getRawX() - mDownX;
                 mVelocityTracker.addMovement(motionEvent);
                 mVelocityTracker.computeCurrentVelocity(1000);
@@ -411,6 +429,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
                 }
 
                 if (mSwiping) {
+                    mCallbacks.onSwipeStarted(mListView, mDownPosition, mDirection);
                     if(mDirection.isLeft() && deltaX > 0 || mDirection.isRight() && deltaX < 0) mFar = false;
                     if(!mFar && Math.abs(deltaX) > mViewWidth*mFarSwipeFraction) mFar = true;
                     if(!mFar) mDirection = (deltaX > 0 ? SwipeDirection.DIRECTION_NORMAL_RIGHT : SwipeDirection.DIRECTION_NORMAL_LEFT);
