@@ -219,6 +219,16 @@ protected void onCreate(Bundle savedInstanceState) {
                 mAdapter.notifyDataSetChanged();
             }
         }
+        
+        @Override
+        public void onSwipeStarted(ListView listView, int position, SwipeDirection direction) {
+            // User is swiping
+        }
+        
+        @Override
+        public void onSwipeEnded(ListView listView, int position, SwipeDirection direction) {
+            // User stopped swiping (lifted finger from the screen)
+        }
     });
 }
 ```
@@ -243,6 +253,18 @@ Allows you to set the fraction of the view width that must be swiped before it i
 Allows you to set the fraction of the view width that must be swiped before it is counted as a far swipe. The float must be between 0 and 1. 0 makes every swipe a far swipe, 1 effectively disables a far swipe.
 
 
+### onSwipeStarted and onSwipeEnded
+You can use these events to execute code once the user starts or stops swiping in a listItem. This can be used to fix issues 
+relating to other libraries hijacking touch events (for example; a SwipeRefreshLayout).
+```
+@Override
+public void onSwipeStarted(ListView listView, int position, SwipeDirection direction) {
+}
+
+@Override
+public void onSwipeEnded(ListView listView, int position, SwipeDirection direction) {
+}
+```
 License
 =======
 
