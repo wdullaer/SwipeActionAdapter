@@ -136,7 +136,7 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
     /**
      * Set whether items should have a fadeOut animation
      *
-     * @param mFadeOut true makes items fade out with a swipe (opacity -> 0)
+     * @param mFadeOut true makes items fade out with a swipe (opacity to 0)
      * @return A reference to the current instance so that commands can be chained
      */
     @SuppressWarnings("unused")
@@ -263,7 +263,9 @@ public class SwipeActionAdapter extends DecoratorAdapter implements
         boolean hasActions(int position, SwipeDirection direction);
         boolean shouldDismiss(int position, SwipeDirection direction);
         void onSwipe(int[] position, SwipeDirection[] direction);
-        void onSwipeStarted(ListView listView, int position, SwipeDirection direction);
-        void onSwipeEnded(ListView listView, int position, SwipeDirection direction);
+        @SuppressWarnings("unused")
+        default void onSwipeStarted(ListView listView, int position, SwipeDirection direction) {};
+        @SuppressWarnings("unused")
+        default void onSwipeEnded(ListView listView, int position, SwipeDirection direction) {};
     }
 }

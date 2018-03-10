@@ -191,7 +191,7 @@ public class SwipeActionTouchListener implements View.OnTouchListener {
      * ListView} using {@link ListView#setOnScrollListener(AbsListView.OnScrollListener)}.
      * If a scroll listener is already assigned, the caller should still pass scroll changes through
      * to this listener. This will ensure that this {@link SwipeActionTouchListener} is
-     * paused during list view scrolling.</p>
+     * paused during list view scrolling.
      *
      * @see SwipeActionTouchListener
      */
