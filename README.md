@@ -37,6 +37,21 @@ the root folder. This will build a `swipeactionadapter.jar` in ```library/build/
 
 You may also add the library as an Android Library to your project. All the library files live in ```library```.
 
+ The library also uses some Java 8 features, which Android Studio will need to transpile. This requires the following stanza in your app's `build.gradle`.
+ See https://developer.android.com/studio/write/java8-support.html for more information on Java 8 support in Android.
+ ```groovy
+ android {
+   ...
+   // Configure only for each module that uses Java 8
+   // language features (either in its source code or
+   // through dependencies).
+   compileOptions {
+     sourceCompatibility JavaVersion.VERSION_1_8
+     targetCompatibility JavaVersion.VERSION_1_8
+   }
+ }
+ ```
+
 Creating your ListView with swipe actions
 -----------------------------------------
 
